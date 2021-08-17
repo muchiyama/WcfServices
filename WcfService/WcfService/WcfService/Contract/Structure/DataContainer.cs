@@ -11,6 +11,7 @@ namespace WcfService.Contract.Structure
         public Guid Id{ get; set; }
         public CommunicationType CommunicationType { get; set; }
         public HostType HostType { get; set; }
+        public HostType SendTo { get; set; }
         public DateTime SendTime { get; set; }
         public DateTime ResponseTime { get; set; }
         public TimeSpan SendTimeOffset => DateTime.Now - SendTime;
@@ -38,6 +39,7 @@ namespace WcfService.Contract.Structure
         public static DataContainerRepository m_instance = new DataContainerRepository();
         public static DataContainer Create()
             => ((IDataContainerRepository)m_instance).Create();
+
         DataContainer IRepository<DataContainer>.Create()
             => new DataContainer()
                 {
@@ -50,7 +52,6 @@ namespace WcfService.Contract.Structure
 
     public interface IDataContainerRepository : IRepository<DataContainer>
     {
-
     }
 
     public interface IRepository<TType>

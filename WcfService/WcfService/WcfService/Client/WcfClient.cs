@@ -12,8 +12,7 @@ namespace WcfService.Client
 {
     public class WcfClient : IWcfClientToCCCCC, IWcfClientToRRRRR, IWcfClientToTTTTT01, IWcfClientToTTTTT02
     {
-        private IWcfLogger m_logger = new WcfConsoleLogger();
-        private IClientChannel m_Clientchannel = null;
+        private static ILogger m_appLogger = new WcfConsoleLogger();
         internal static void OpenClientChannelInternal<TType>(ref IClientChannel ic, string ip, int port, Action<TType> service)
         {
             try
@@ -29,11 +28,11 @@ namespace WcfService.Client
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
             }
         }
 
-        internal void SendDataInternal<TType>(ISimplexService proxy, Action<TType> action, TType param, TimeSpan timeout)
+        internal static void SendDataInternal<TType>(ISimplexService proxy, Action<TType> action, TType param, TimeSpan timeout)
         {
             try
             {
@@ -45,9 +44,12 @@ namespace WcfService.Client
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message + Environment.NewLine + ex.StackTrace);
+                m_appLogger.Logging(ex.Message + Environment.NewLine + ex.StackTrace);
             }
         }
+
+        private IWcfLogger m_logger = new WcfConsoleLogger();
+        private IClientChannel m_Clientchannel = null;
         public WcfClient()
         {
         }
@@ -61,7 +63,7 @@ namespace WcfService.Client
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
             }
         }
 
@@ -74,7 +76,7 @@ namespace WcfService.Client
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
             }
         }
 
@@ -87,7 +89,7 @@ namespace WcfService.Client
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
             }
         }
         void IWcfClientToTTTTT02.Open()
@@ -99,7 +101,7 @@ namespace WcfService.Client
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
             }
         }
         public void SendData(DataContainer container)
@@ -113,7 +115,7 @@ namespace WcfService.Client
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
             }
         }
 

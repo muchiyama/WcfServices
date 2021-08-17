@@ -28,7 +28,16 @@ namespace WcfClientCCCCC
             {
                 Parallel.ForEach(Clients, c =>
                 {
-                    c.Value.SendData(DataContainerRepository.Create());
+                    var container = new DataContainer()
+                    {
+                        Id = Guid.NewGuid(),
+                        CommunicationType = CommunicationType.REQUEST,
+                        HostType = HostType.CCCCC,
+                        SendTo = c.Key == typeof(IWcfClientToTTTTT01) ? HostType.TTTTT01 : HostType.TTTTT02,
+                        SendTime = DateTime.Now,
+                    };
+
+                    c.Value.SendData(container);
                 });
 
                 m_logger.Logging($"server running on {Server.Stauts()} status...");

@@ -14,7 +14,7 @@ namespace WcfClientRRRRR
 {
     class Program
     {
-        static private ILogger m_logger = new WcfConsoleLogger();
+        static private readonly ILogger m_logger = new WcfConsoleLogger();
         static async Task Main(string[] args)
         {
             await StartUp();
@@ -33,6 +33,7 @@ namespace WcfClientRRRRR
                         Id = Guid.NewGuid(),
                         CommunicationType = CommunicationType.REQUEST,
                         HostType = HostType.RRRRR,
+                        SendTo = c.Key == typeof(IWcfClientToTTTTT01) ? HostType.TTTTT01 : HostType.TTTTT02,
                         SendTime = DateTime.Now,
                     };
 

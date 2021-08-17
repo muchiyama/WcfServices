@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "wcfclientccccc": "StartDebugging",
+        "wcfclientrrrrr": "StartDebugging",
+        "wcfserverttttt01": "StartDebugging",
+        "wcfserverttttt02": "StartDebugging"
+      }
+    }
+  }
+}

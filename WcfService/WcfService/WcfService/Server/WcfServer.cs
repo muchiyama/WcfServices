@@ -86,6 +86,7 @@ namespace WcfService.Server
                     else if (container.HostType == HostType.TTTTT01) client = FetchWcfClient(typeof(IWcfClientToTTTTT02), server);
 
                     container.CommunicationType = CommunicationType.RESPONSE;
+                    container.SendTo = container.HostType;
                     container.HostType = server.m_hostType;
                     container.ResponseTime = DateTime.Now;
 
@@ -112,6 +113,7 @@ namespace WcfService.Server
         }
 
         private IWcfLogger m_logger = new WcfConsoleLogger();
+        private ILogger m_appLogger = new WcfConsoleLogger();
         private ServiceHost m_serviceHost = null;
         private HostType m_hostType = HostType.None;
         internal ConcurrentDictionary<Type, WcfClient> Clients = new ConcurrentDictionary<Type, WcfClient>();
@@ -132,7 +134,7 @@ namespace WcfService.Server
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
             }
         }
 
