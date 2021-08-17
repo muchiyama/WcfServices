@@ -15,7 +15,7 @@ namespace WcfService
         public static ConfigrationCommon Config
             => m_configration;
         private static ConfigrationCommon m_configration { get; set; } = new ConfigrationCommon();
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 0, 5000);
+        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 5);
     }
 
     public class ConfigrationTTTTT01 : IConfigration
@@ -24,7 +24,7 @@ namespace WcfService
             => m_configration;
         private static ConfigrationTTTTT01 m_configration { get; set; } = new ConfigrationTTTTT01();
         private ConfigrationTTTTT01() { }
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 0, 5000);
+        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
         public string Ip => "localhost";
         public int Port => 6780;
     }
@@ -34,7 +34,7 @@ namespace WcfService
             => m_configration;
         private static ConfigrationTTTTT02 m_configration { get; set; } = new ConfigrationTTTTT02();
         private ConfigrationTTTTT02() { }
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 0, 5000);
+        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
         public string Ip => "localhost";
         public int Port => 6781;
     }
@@ -45,7 +45,7 @@ namespace WcfService
         private static ConfigrationCCCCC m_configration { get; set; } = new ConfigrationCCCCC();
 
         private ConfigrationCCCCC() { }
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 0, 5000);
+        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
         public string Ip => "localhost";
         public int Port => 6782;
     }
@@ -56,7 +56,7 @@ namespace WcfService
         private static ConfigrationRRRRR m_configration { get; set; } = new ConfigrationRRRRR();
 
         private ConfigrationRRRRR() { }
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 0, 5000);
+        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
         public string Ip => "localhost";
         public int Port => 6783;
     }

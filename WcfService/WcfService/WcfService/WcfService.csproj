@@ -55,6 +55,7 @@
     <Compile Include="Contract\Structure\IContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\WcfServer.cs" />
+    <Compile Include="WcfConsoleLogger.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

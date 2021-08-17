@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WcfService;
 using WcfService.Client;
 using WcfService.Contract.Structure;
 using WcfService.Server;
@@ -13,6 +14,7 @@ namespace WcfServerTTTTT01
 {
     class Program
     {
+        static private ILogger m_logger = new WcfConsoleLogger();
         static async Task Main(string[] args)
         {
             await StartUp();
@@ -23,7 +25,8 @@ namespace WcfServerTTTTT01
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(5000);
+                m_logger.Logging($"server running on {Server.Stauts()} status...");
+                await Task.Delay(50000);
             }
         }
         static async Task StartUp()
@@ -31,31 +34,24 @@ namespace WcfServerTTTTT01
             ((IWcfServerTTTTT01)Server).Start();
 
             Console.WriteLine("server started");
-            await Task.Delay(5000);
-            Console.WriteLine("press any key to start communication");
-            Console.ReadLine();
-
-            while (true)
+            Console.WriteLine("wating for starting service.....");
+            await Task.Delay(10000);
+            Console.WriteLine("start to service TTTTT01");
+            Console.CancelKeyPress += (sender, eventArgs) =>
             {
-                var client = new WcfClient();
-                ((IWcfClientTTTTTToCCCCC)client).Open();
-                var result = Clients.TryAdd(typeof(IWcfClientTTTTTToCCCCC), client);
-                if (result) break;
-            }
-            while (true)
-            {
-                var client = new WcfClient();
-                ((IWcfClientTTTTTToRRRRR)client).Open();
-                var result = Clients.TryAdd(typeof(IWcfClientTTTTTToRRRRR), client);
-                if (result) break;
-            }
-
-            Console.CancelKeyPress += (sender, eventArgs) => TokenSource.Cancel();
-
+                TokenSource.Cancel();
+                Server.Dispose();
+                ShutDown();
+            };
         }
 
-        private static ConcurrentDictionary<Type, WcfClient> Clients = new ConcurrentDictionary<Type, WcfClient>();
-        private static WcfServer Server = new WcfServer();
+        [STAThread]
+        static void ShutDown()
+        {
+            Environment.Exit(0);
+        }
+
+        private static WcfServer Server = new WcfServer(HostType.TTTTT01);
         private static CancellationTokenSource TokenSource { get; set; } = new CancellationTokenSource();
     }
 }

@@ -10,8 +10,9 @@ using WcfService.Contract.Structure;
 
 namespace WcfService.Client
 {
-    public class WcfClient : IWcfClientTTTTTToCCCCC, IWcfClientTTTTTToRRRRR, IWcfClientCCCCCToTTTTT01, IWcfClientCCCCCToTTTTT02, IWcfClientRRRRRToTTTTT01, IWcfClientRRRRRToTTTTT02
+    public class WcfClient : IWcfClientToCCCCC, IWcfClientToRRRRR, IWcfClientToTTTTT01, IWcfClientToTTTTT02
     {
+        private IWcfLogger m_logger = new WcfConsoleLogger();
         private IClientChannel m_Clientchannel = null;
         internal static void OpenClientChannelInternal<TType>(ref IClientChannel ic, string ip, int port, Action<TType> service)
         {
@@ -39,7 +40,6 @@ namespace WcfService.Client
                 IClientChannel ic = proxy as IClientChannel;
                 ic.OperationTimeout = timeout;
                 var proxyType = proxy.GetType();
-
                 var mi = proxyType.GetMethod(action.Method.Name);
                 mi.Invoke(proxy, new object[] { param });
             }
@@ -52,7 +52,7 @@ namespace WcfService.Client
         {
         }
 
-        void IWcfClientTTTTTToCCCCC.Open()
+        void IWcfClientToCCCCC.Open()
         {
             try
             {
@@ -65,7 +65,7 @@ namespace WcfService.Client
             }
         }
 
-        void IWcfClientTTTTTToRRRRR.Open()
+        void IWcfClientToRRRRR.Open()
         {
             try
             {
@@ -78,7 +78,7 @@ namespace WcfService.Client
             }
         }
 
-        void IWcfClientCCCCCToTTTTT01.Open()
+        void IWcfClientToTTTTT01.Open()
         {
             try
             {
@@ -90,32 +90,7 @@ namespace WcfService.Client
                 Console.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
             }
         }
-        void IWcfClientCCCCCToTTTTT02.Open()
-        {
-            try
-            {
-                ISimplexService service = new SimplexService();
-                OpenClientChannelInternal(ref m_Clientchannel, ConfigrationTTTTT02.Config.Ip, ConfigrationTTTTT02.Config.Port, (Action<DataContainer>)service.Action);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            }
-        }
-
-        void IWcfClientRRRRRToTTTTT01.Open()
-        {
-            try
-            {
-                ISimplexService service = new SimplexService();
-                OpenClientChannelInternal(ref m_Clientchannel, ConfigrationTTTTT01.Config.Ip, ConfigrationTTTTT01.Config.Port, (Action<DataContainer>)service.Action);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            }
-        }
-        void IWcfClientRRRRRToTTTTT02.Open()
+        void IWcfClientToTTTTT02.Open()
         {
             try
             {
@@ -131,6 +106,8 @@ namespace WcfService.Client
         {
             try
             {
+                m_logger.Logging(container);
+
                 ISimplexService proxy = (ISimplexService)m_Clientchannel;
                 SendDataInternal(proxy, proxy.Action, container, ConfigrationCommon.Config.TimeOut);
             }
@@ -139,29 +116,24 @@ namespace WcfService.Client
                 Console.WriteLine($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
             }
         }
+
+        public string Status() 
+            => m_Clientchannel.State.ToString();
     }
 
-    public interface IWcfClientTTTTTToCCCCC
+    public interface IWcfClientToCCCCC
     {
         void Open();
     }
-    public interface IWcfClientTTTTTToRRRRR
+    public interface IWcfClientToRRRRR
     {
         void Open();
     }
-    public interface IWcfClientCCCCCToTTTTT01
+    public interface IWcfClientToTTTTT01
     {
         void Open();
     }
-    public interface IWcfClientCCCCCToTTTTT02
-    {
-        void Open();
-    }
-    public interface IWcfClientRRRRRToTTTTT01
-    {
-        void Open();
-    }
-    public interface IWcfClientRRRRRToTTTTT02
+    public interface IWcfClientToTTTTT02
     {
         void Open();
     }

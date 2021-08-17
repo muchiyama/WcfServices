@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WcfService;
 using WcfService.Client;
 using WcfService.Contract.Structure;
 using WcfService.Server;
@@ -13,6 +14,7 @@ namespace WcfClientCCCCC
 {
     class Program
     {
+        static private ILogger m_logger = new WcfConsoleLogger();
         static async Task Main(string[] args)
         {
             await StartUp();
@@ -25,17 +27,12 @@ namespace WcfClientCCCCC
             {
                 Parallel.ForEach(Clients, c =>
                 {
-                    var container = new DataContainer()
-                    {
-                        Id = Guid.NewGuid(),
-                        CommunicationType = CommunicationType.REQUEST,
-                        HostType = HostType.CCCCC,
-                        ExecutionTime = DateTime.Now,
-                    };
-
-                    c.Value.SendData(container);
+                    c.Value.SendData(DataContainerRepository.Create());
                 });
 
+                m_logger.Logging($"server running on {Server.Stauts()} status...");
+                m_logger.Logging($"client{Clients.FirstOrDefault().Key.ToString()}: {Clients.FirstOrDefault().Value.Status()}");
+                m_logger.Logging($"client{Clients.LastOrDefault().Key.ToString()}: {Clients.LastOrDefault().Value.Status()}");
                 await Task.Delay(5000);
             }
         }
@@ -44,31 +41,41 @@ namespace WcfClientCCCCC
         {
             ((IWcfServerCCCCC)Server).Start();
 
-            Console.WriteLine("server started");
-            await Task.Delay(5000);
-            Console.WriteLine("press any key to start communication");
-            Console.ReadLine();
+            Console.WriteLine("server started.....");
+            Console.WriteLine("wating for starting service.....");
+            await Task.Delay(10000);
+            Console.WriteLine("start to service CCCCC");
 
             while (true)
             {
                 var client = new WcfClient();
-                ((IWcfClientCCCCCToTTTTT01)client).Open();
-                var result = Clients.TryAdd(typeof(IWcfClientCCCCCToTTTTT01), client);
+                ((IWcfClientToTTTTT01)client).Open();
+                var result = Clients.TryAdd(typeof(IWcfClientToTTTTT01), client);
                 if (result) break;
             }
             while (true)
             {
                 var client = new WcfClient();
-                ((IWcfClientCCCCCToTTTTT02)client).Open();
-                var result = Clients.TryAdd(typeof(IWcfClientCCCCCToTTTTT02), client);
+                ((IWcfClientToTTTTT02)client).Open();
+                var result = Clients.TryAdd(typeof(IWcfClientToTTTTT02), client);
                 if (result) break;
             }
+            Console.CancelKeyPress += (sender, eventArgs) =>
+            {
+                TokenSource.Cancel();
+                Server.Dispose();
+                ShutDown();
+            };
+        }
 
-            Console.CancelKeyPress += (sender, eventArgs) => TokenSource.Cancel();
+        [STAThread]
+        static void ShutDown()
+        {
+            Environment.Exit(0);
         }
 
         private static ConcurrentDictionary<Type, WcfClient> Clients = new ConcurrentDictionary<Type, WcfClient>();
-        private static WcfServer Server = new WcfServer();
+        private static WcfServer Server = new WcfServer(HostType.CCCCC);
         private static CancellationTokenSource TokenSource { get; set; } = new CancellationTokenSource();
     }
 }
