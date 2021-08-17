@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Burdening.cs" />
     <Compile Include="Client\WcfClient.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Configrations.cs" />

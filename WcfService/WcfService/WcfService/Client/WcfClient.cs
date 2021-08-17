@@ -117,7 +117,7 @@ namespace WcfService.Client
             }
         }
 
-        public string Status() 
+        public string Status
             => m_Clientchannel.State.ToString();
     }
 

@@ -93,7 +93,7 @@ namespace WcfService.Server
                     break;
                 case CommunicationType.RESPONSE:
                     if (DateTime.Now - container.SendTime > ConfigrationCommon.Config.TimeOut)
-                        throw new InvalidAsynchronousStateException("リクエストから5秒の間レスポンスがありませんでした。");
+                        throw new InvalidAsynchronousStateException($"リクエストから5秒の間レスポンスがありませんでした。 --- {((IWcfFormatter)server.m_logger).Format(container)}");
                     break;
                 default:
                     Console.WriteLine("do nothing");

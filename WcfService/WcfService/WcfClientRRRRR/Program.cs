@@ -23,6 +23,7 @@ namespace WcfClientRRRRR
 
         static async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            //Burdening.Burden();
             while (!stoppingToken.IsCancellationRequested)
             {
                 Parallel.ForEach(Clients, c =>
@@ -39,9 +40,9 @@ namespace WcfClientRRRRR
                 });
 
                 m_logger.Logging($"server running on {Server.Stauts()} status...");
-                m_logger.Logging($"client{Clients.FirstOrDefault().Key.ToString()}: {Clients.FirstOrDefault().Value.Status()}");
-                m_logger.Logging($"client{Clients.LastOrDefault().Key.ToString()}: {Clients.LastOrDefault().Value.Status()}");
-                await Task.Delay(5000);
+                m_logger.Logging($"client{Clients.FirstOrDefault().Key}: {Clients.FirstOrDefault().Value.Status}");
+                m_logger.Logging($"client{Clients.LastOrDefault().Key}: {Clients.LastOrDefault().Value.Status}");
+                await Task.Delay(ConfigrationCommon.Config.WaitForExecuteAsync);
             }
         }
         static async Task StartUp()

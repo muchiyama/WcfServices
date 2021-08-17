@@ -16,6 +16,8 @@ namespace WcfService
             => m_configration;
         private static ConfigrationCommon m_configration { get; set; } = new ConfigrationCommon();
         public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 5);
+        public int WaitForExecuteAsync => 5000;
+
     }
 
     public class ConfigrationTTTTT01 : IConfigration

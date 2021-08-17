@@ -8,9 +8,13 @@ using WcfService.Contract.Structure;
 
 namespace WcfService
 {
-    public class WcfConsoleLogger : IWcfLogger, ILogger
+    public class WcfConsoleLogger : IWcfLogger, IWcfFormatter, ILogger
     {
         private IWcfFormatter formatter = new WcfFormatter();
+
+        public string Format(DataContainer container)
+            =>  formatter.Format(container);
+
         void IWcfLogger.Logging(DataContainer container)
         {
             Console.WriteLine(formatter.Format(container));

@@ -23,10 +23,11 @@ namespace WcfServerTTTTT01
 
         static async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            //Burdening.Burden();
             while (!stoppingToken.IsCancellationRequested)
             {
                 m_logger.Logging($"server running on {Server.Stauts()} status...");
-                await Task.Delay(50000);
+                await Task.Delay(ConfigrationCommon.Config.WaitForExecuteAsync);
             }
         }
         static async Task StartUp()
