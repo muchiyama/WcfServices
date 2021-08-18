@@ -10,11 +10,11 @@ using WcfService.Client;
 using WcfService.Contract.Structure;
 using WcfService.Server;
 
-namespace WcfClientCCCCC
+namespace WcfClientRRRRR
 {
     class Program
     {
-        static private ILogger m_logger = new WcfConsoleLogger();
+        static private readonly ILogger m_logger = new WcfConsoleLogger();
         static async Task Main(string[] args)
         {
             await StartUp();
@@ -23,8 +23,9 @@ namespace WcfClientCCCCC
 
         static async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            //Burdening.Burden();
-             while (!stoppingToken.IsCancellationRequested)
+            if (ConfigrationCommon.Config.BurderingFlag) Burdening.Burden();
+
+            while (!stoppingToken.IsCancellationRequested)
             {
                 Parallel.ForEach(Clients, c =>
                 {
@@ -32,7 +33,7 @@ namespace WcfClientCCCCC
                     {
                         Id = Guid.NewGuid(),
                         CommunicationType = CommunicationType.REQUEST,
-                        HostType = HostType.CCCCC,
+                        HostType = HostType.RRRRR,
                         SendTo = c.Key == typeof(IWcfClientToTTTTT01) ? HostType.TTTTT01 : HostType.TTTTT02,
                         SendTime = DateTime.Now,
                     };
@@ -46,15 +47,14 @@ namespace WcfClientCCCCC
                 await Task.Delay(ConfigrationCommon.Config.WaitForExecuteAsync);
             }
         }
-
         static async Task StartUp()
         {
-            ((IWcfServerCCCCC)Server).Start();
+            ((IWcfServerRRRRR)Server).Start();
 
-            Console.WriteLine("server started.....");
+            Console.WriteLine("server started");
             Console.WriteLine("wating for starting service.....");
             await Task.Delay(10000);
-            Console.WriteLine("start to service CCCCC");
+            Console.WriteLine("start to service RRRRR");
 
             while (true)
             {
@@ -85,7 +85,7 @@ namespace WcfClientCCCCC
         }
 
         private static ConcurrentDictionary<Type, WcfClient> Clients = new ConcurrentDictionary<Type, WcfClient>();
-        private static WcfServer Server = new WcfServer(HostType.CCCCC);
+        private static WcfServer Server = new WcfServer(HostType.RRRRR);
         private static CancellationTokenSource TokenSource { get; set; } = new CancellationTokenSource();
     }
 }

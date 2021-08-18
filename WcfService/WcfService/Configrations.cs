@@ -22,6 +22,7 @@ namespace WcfService
         private static ConfigrationCommon Configration { get; set; } = new ConfigrationCommon();
         public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 5);
         public int WaitForExecuteAsync => 5000;
+        public bool BurderingFlag => true;
         internal static TargetRunningEnvironment RunningEnv => TargetEnv == "docker" ? TargetRunningEnvironment.DockerWindowsKernel : TargetRunningEnvironment.Windows;
         internal static string TargetEnv => Environment.GetEnvironmentVariable("runninngEnv");
     }

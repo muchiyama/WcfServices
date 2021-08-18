@@ -23,7 +23,8 @@ namespace WcfServerTTTTT01
 
         static async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            //Burdening.Burden();
+            if (ConfigrationCommon.Config.BurderingFlag) Burdening.Burden();
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 m_logger.Logging($"server running on {Server.Stauts()} status...");

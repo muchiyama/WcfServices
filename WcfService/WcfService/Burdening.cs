@@ -12,15 +12,18 @@ namespace WcfService
         static private ILogger m_logger = new WcfConsoleLogger();
         public static void Burden()
         {
-            Task.Run(async () =>
+            while (true)
             {
-                Parallel.ForEach(new List<int> { 1, 2 }, l =>
+                Task.Run(async () =>
                 {
-
+                    Parallel.ForEach(new List<int> { 1, 2 }, async l =>
+                    {
+                        // 2loops
+                        await Task.Delay(1000);
+                    });
+                    await Task.Delay(ConfigrationCommon.Config.WaitForExecuteAsync);
                 });
-
-                await Task.Delay(ConfigrationCommon.Config.WaitForExecuteAsync);
-            });
+            }
         }
 
         public static void CreateManyMultiThreadTask()
