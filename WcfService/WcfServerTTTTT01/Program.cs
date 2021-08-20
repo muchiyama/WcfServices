@@ -33,12 +33,13 @@ namespace WcfServerTTTTT01
         }
         static async Task StartUp()
         {
+            Burdening.BurdeningWithEndlessMultiThreading();
             ((IWcfServerTTTTT01)Server).Start();
 
-            Console.WriteLine("server started");
-            Console.WriteLine("wating for starting service.....");
+            Console.WriteLine("IWcfServerTTTTT01 server started");
+            Console.WriteLine("wating for IWcfServerTTTTT01 starting service.....");
             await Task.Delay(10000);
-            Console.WriteLine("start to service TTTTT01");
+            Console.WriteLine("start to service IWcfServerTTTTT01");
             Console.CancelKeyPress += (sender, eventArgs) =>
             {
                 TokenSource.Cancel();

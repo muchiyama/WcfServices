@@ -29,7 +29,7 @@ namespace WcfService
     public class WcfFormatter : IWcfFormatter
     {
         string IWcfFormatter.Format(DataContainer container)
-            => $"[{System.Threading.Thread.CurrentThread.ManagedThreadId}] | Id=[{container.Id}] | CmmunicationType=[{container.CommunicationType}] | Sender=[{container.HostType}] | SendTo={container.SendTo} | SendTime=[{container.SendTime.ToString("hh:mm:ss.ffff")} | ResponseTime=[{container.ResponseTime.ToString("hh:mm:ss.ffff")}] | SendOffset=[{container.SendTimeOffset} | ResponseOffset=[{container.ResponseTimeOffset}]]";
+            => $"[{System.Threading.Thread.CurrentThread.ManagedThreadId}] | Id=[{container.Id}] | CmmunicationType=[{container.CommunicationType}] | CmmunicationStatu=[{container.CommunicationStatus}] | Sender=[{container.HostType}] | SendTo={container.SendTo} | SendTime=[{container.SendTime.ToString("hh:mm:ss.ffff")} | SendOffset=[{container.SendTimeOffset} | RecieveTime=[{container.RecieveTime}] | RecieveTimeOffSet=[{container.RecieveTimeOffSet}] | ResponseTime=[{container.ResponseTime.ToString("hh:mm:ss.ffff")}] | ResponseOffset=[{container.ResponseTimeOffset}]]";
     }
 
     public interface ILogger

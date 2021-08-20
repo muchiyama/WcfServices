@@ -109,10 +109,10 @@ namespace WcfService.Client
             try
             {
                 m_logger.Logging(container);
-
                 ISimplexService proxy = (ISimplexService)m_Clientchannel;
                 SendDataInternal(proxy, proxy.Action, container, ConfigrationCommon.Config.TimeOut);
             }
+
             catch (Exception ex)
             {
                 m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");

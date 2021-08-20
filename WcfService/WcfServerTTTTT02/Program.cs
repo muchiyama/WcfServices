@@ -36,10 +36,10 @@ namespace WcfServerTTTTT02
         {
             ((IWcfServerTTTTT02)Server).Start();
 
-            Console.WriteLine("server started");
-            Console.WriteLine("wating for starting service.....");
+            Console.WriteLine("IWcfServerTTTTT02 server started");
+            Console.WriteLine("wating for IWcfServerTTTTT02 starting service.....");
             await Task.Delay(10000);
-            Console.WriteLine("start to service TTTTT02");
+            Console.WriteLine("start to service IWcfServerTTTTT02");
             Console.CancelKeyPress += (sender, eventArgs) =>
             {
                 TokenSource.Cancel();

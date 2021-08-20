@@ -12,21 +12,33 @@ namespace WcfService
         static private ILogger m_logger = new WcfConsoleLogger();
         public static void Burden()
         {
-            while (true)
-            {
                 Task.Run(async () =>
                 {
-                    Parallel.ForEach(new List<int> { 1, 2 }, async l =>
+                    while (true)
                     {
-                        // 2loops
-                        await Task.Delay(1000);
-                    });
-                    await Task.Delay(ConfigrationCommon.Config.WaitForExecuteAsync);
+                        Parallel.ForEach(new List<int> { 1, 2 }, async l =>
+                        {
+                            // 2loops
+                            await Task.Delay(1000);
+                        });
+                        await Task.Delay(ConfigrationCommon.Config.WaitForExecuteAsync);
+                    }  
                 });
+        }
+
+        public static void Wait10Secound()
+        {
+            var limit = new TimeSpan(0, 0, 0, 10);
+            var stopWatch = new System.Diagnostics.Stopwatch();
+            stopWatch.Start();
+
+            while (stopWatch.Elapsed < limit)
+            {
+
             }
         }
 
-        public static void CreateManyMultiThreadTask()
+        public static void BurdeningWithEndlessMultiThreading()
         {
             Task.Run(() =>
             {
@@ -40,11 +52,14 @@ namespace WcfService
 
                     Parallel.ForEach(list, f =>
                     {
-                        int worker;
-                        int completion;
-                        ThreadPool.GetAvailableThreads(out worker, out completion);
-                        m_logger.Logging($"[{Thread.CurrentThread.ManagedThreadId}] | worker : {worker} | completion : {completion}");
-                        Thread.Sleep(10000);
+                        var limit = new TimeSpan(0, 0, 0, 10);
+                        var stopWatch = new System.Diagnostics.Stopwatch();
+                        stopWatch.Start();
+
+                        while (stopWatch.Elapsed < limit)
+                        {
+
+                        }
                     });
                 }
             });

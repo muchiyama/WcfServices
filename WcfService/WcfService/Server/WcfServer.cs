@@ -14,6 +14,10 @@ using WcfService.Contract.Structure;
 
 namespace WcfService.Server
 {
+    /// <summary>
+    /// wcfサーバー用
+    /// Interfaceは各起動設定用に用意
+    /// </summary>
     public class WcfServer : IWcfServerTTTTT01, IWcfServerTTTTT02, IWcfServerCCCCC, IWcfServerRRRRR, IDisposable
     {
         internal static void StartServiceInternal<TType>(ref ServiceHost serviceHost, ASimplexService service, string ip, int port, Action<TType> action)
@@ -79,13 +83,16 @@ namespace WcfService.Server
             switch (container.CommunicationType)
             {
                 case CommunicationType.REQUEST:
+                    container.RecieveTime = DateTime.Now;
+
                     WcfClient client = null;
                     if (container.HostType == HostType.CCCCC) client = FetchWcfClient(typeof(IWcfClientToCCCCC), server);
                     else if (container.HostType == HostType.RRRRR) client = FetchWcfClient(typeof(IWcfClientToRRRRR), server);
                     else if (container.HostType == HostType.TTTTT01) client = FetchWcfClient(typeof(IWcfClientToTTTTT01), server);
                     else if (container.HostType == HostType.TTTTT01) client = FetchWcfClient(typeof(IWcfClientToTTTTT02), server);
-
+                    
                     container.CommunicationType = CommunicationType.RESPONSE;
+                    container.CommunicationStatus = CommunicationStatus.Recieved;
                     container.SendTo = container.HostType;
                     container.HostType = server.m_hostType;
                     container.ResponseTime = DateTime.Now;
@@ -93,6 +100,9 @@ namespace WcfService.Server
                     client.SendData(container);
                     break;
                 case CommunicationType.RESPONSE:
+                    container.CommunicationStatus = CommunicationStatus.Completed;
+                    server.m_logger.Logging(container);
+
                     if (DateTime.Now - container.SendTime > ConfigrationCommon.Config.TimeOut)
                         throw new InvalidAsynchronousStateException($"リクエストから5秒の間レスポンスがありませんでした。 --- {((IWcfFormatter)server.m_logger).Format(container)}");
                     break;
@@ -112,23 +122,36 @@ namespace WcfService.Server
             }
         }
 
+        /// <summary>
+        /// for DataContainer logger
+        /// </summary>
         private IWcfLogger m_logger = new WcfConsoleLogger();
+        /// <summary>
+        /// for message logger
+        /// </summary>
         private ILogger m_appLogger = new WcfConsoleLogger();
         private ServiceHost m_serviceHost = null;
         private HostType m_hostType = HostType.None;
         internal ConcurrentDictionary<Type, WcfClient> Clients = new ConcurrentDictionary<Type, WcfClient>();
 
+        /// <summary>
+        /// contructor
+        /// </summary>
+        /// <param name="hostType"></param>
         public WcfServer(HostType hostType)
         {
             m_hostType = hostType;
         }
 
+        /// <summary>
+        /// on recieved action
+        /// </summary>
+        /// <param name="container"></param>
         public void Recieve(DataContainer container)
         {
             try
             {
                 m_logger.Logging(container);
-
                 CreateClientsIfNotExist(container);
                 RecieveInternal(container, this);
             }
@@ -138,6 +161,10 @@ namespace WcfService.Server
             }
         }
 
+        /// <summary>
+        /// server status
+        /// </summary>
+        /// <returns></returns>
         public string Stauts()
         {
             return m_serviceHost.State.ToString();
@@ -163,6 +190,9 @@ namespace WcfService.Server
             simplexService.RaiseEventHandler = Recieve;
             StartServiceInternal(ref m_serviceHost, simplexService, ConfigrationCCCCC.Config.Ip, ConfigrationCCCCC.Config.Port, (Action<DataContainer>)simplexService.Action);
         }
+        /// <summary>
+        /// start listen and setting on recieve action
+        /// </summary>
         void IWcfServerRRRRR.Start()
         {
             SimplexService simplexService = new SimplexService();

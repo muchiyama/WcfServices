@@ -33,6 +33,7 @@ namespace WcfClientRRRRR
                     {
                         Id = Guid.NewGuid(),
                         CommunicationType = CommunicationType.REQUEST,
+                        CommunicationStatus = CommunicationStatus.Sending,
                         HostType = HostType.RRRRR,
                         SendTo = c.Key == typeof(IWcfClientToTTTTT01) ? HostType.TTTTT01 : HostType.TTTTT02,
                         SendTime = DateTime.Now,
@@ -51,10 +52,10 @@ namespace WcfClientRRRRR
         {
             ((IWcfServerRRRRR)Server).Start();
 
-            Console.WriteLine("server started");
-            Console.WriteLine("wating for starting service.....");
+            Console.WriteLine("IWcfServerRRRRR server started");
+            Console.WriteLine("wating for IWcfServerRRRRR starting service.....");
             await Task.Delay(10000);
-            Console.WriteLine("start to service RRRRR");
+            Console.WriteLine("start to service IWcfServerRRRRR");
 
             while (true)
             {

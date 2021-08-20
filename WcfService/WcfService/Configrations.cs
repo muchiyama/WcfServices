@@ -20,7 +20,8 @@ namespace WcfService
         public static ConfigrationCommon Config
             => Configration;
         private static ConfigrationCommon Configration { get; set; } = new ConfigrationCommon();
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 5);
+        //public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 5);
+        public TimeSpan TimeOut => new TimeSpan(0, 0, 1, 5);
         public int WaitForExecuteAsync => 5000;
         public bool BurderingFlag => true;
         internal static TargetRunningEnvironment RunningEnv => TargetEnv == "docker" ? TargetRunningEnvironment.DockerWindowsKernel : TargetRunningEnvironment.Windows;
@@ -33,7 +34,8 @@ namespace WcfService
         private static ConfigrationCCCCC Configration { get; set; } = new ConfigrationCCCCC();
 
         private ConfigrationCCCCC() { }
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
+        //public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
+        public TimeSpan TimeOut => new TimeSpan(0, 0, 1, 5);
         public string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.11";
         public int Port => 6782;
     }
@@ -44,7 +46,8 @@ namespace WcfService
         private static ConfigrationRRRRR Configration { get; set; } = new ConfigrationRRRRR();
 
         private ConfigrationRRRRR() { }
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
+        //public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
+        public TimeSpan TimeOut => new TimeSpan(0, 0, 1, 5);
         public string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.12";
         public int Port => 6783;
     }
@@ -54,7 +57,8 @@ namespace WcfService
             => Configration;
         private static ConfigrationTTTTT01 Configration { get; set; } = new ConfigrationTTTTT01();
         private ConfigrationTTTTT01() { }
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
+        //public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
+        public TimeSpan TimeOut => new TimeSpan(0, 0, 1, 5);
         public string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.13";
         public int Port => 6780;
     }
@@ -64,7 +68,8 @@ namespace WcfService
             => Configration;
         private static ConfigrationTTTTT02 Configration { get; set; } = new ConfigrationTTTTT02();
         private ConfigrationTTTTT02() { }
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
+        //public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
+        public TimeSpan TimeOut => new TimeSpan(0, 0, 1, 5);
         public string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.14";
         public int Port => 6781;
     }

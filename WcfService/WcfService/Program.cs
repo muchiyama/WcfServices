@@ -10,6 +10,9 @@ using WcfService.Server;
 
 namespace WcfService
 {
+    /// <summary>
+    /// 動作確認用のエントリポイント
+    /// </summary>
     public class Program
     {
         public static void Main(string[] args)
