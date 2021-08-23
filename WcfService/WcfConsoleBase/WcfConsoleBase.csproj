@@ -41,10 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interfaces\Class1.cs" />
-    <Compile Include="ClientService\ClientConSoleService.cs" />
+    <Compile Include="ClientService\WcfConsoleApplicationClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerService\ServerConsoleService.cs" />
+    <Compile Include="ServerService\WcfConsoleApplicationServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WcfService\WcfService.csproj">

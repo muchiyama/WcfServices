@@ -21,16 +21,17 @@ namespace WcfService
         internal static ConfigrationCommon Config
             => Configration;
         private static ConfigrationCommon Configration { get; set; } = new ConfigrationCommon();
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 5);
-        public TimeSpan AdditionalTimeOutWhenSendWithClone => new TimeSpan(0, 0, 0, 30);
-        public int WaitIntervalForTimer => 5000;
-        public int WaitIntervalForAdditionalSend => 5000;
         internal static TargetRunningEnvironment RunningEnv => TargetEnv == "docker" ? TargetRunningEnvironment.DockerWindowsKernel : TargetRunningEnvironment.Windows;
         internal static string TargetEnv => Environment.GetEnvironmentVariable("runninngEnv");
+        public virtual TimeSpan TimeOut => new TimeSpan(0, 0, 10, 5);
+        public virtual TimeSpan TimeOutForAdditionalSend => new TimeSpan(0, 0, 10, 30);
+        public virtual int WaitIntervalForSendTimer => 5000;
+        public virtual int WaitIntervalForAdditionalSend => 5000;
         public virtual string Ip => string.Empty;
-        public virtual int Port => 6782;
-        public virtual bool BurderingFlag => false;
-        public virtual bool BurderingEndlessMultiThreading => false;
+        public virtual int Port => -1;
+        public virtual int BurderingInterval => 0;
+        public virtual int SendBurderingInterval => 0;
+        public virtual int RecieveBurderingInterval => 0;
     }
     public class ConfigrationCCCCC : ConfigrationCommon
     {
@@ -40,8 +41,6 @@ namespace WcfService
         private ConfigrationCCCCC() { }
         public override string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.11";
         public override int Port => 6782;
-        public override bool BurderingFlag => false;
-        public override bool BurderingEndlessMultiThreading => false;
     }
     public class ConfigrationRRRRR : ConfigrationCommon
     {
@@ -52,8 +51,6 @@ namespace WcfService
         private ConfigrationRRRRR() { }
         public override string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.12";
         public override int Port => 6783;
-        public override bool BurderingFlag => false;
-        public override bool BurderingEndlessMultiThreading => false;
     }
     public class ConfigrationTTTTT01 : ConfigrationCommon
     {
@@ -63,8 +60,6 @@ namespace WcfService
         private ConfigrationTTTTT01() { }
         public override string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.13";
         public override int Port => 6780;
-        public override bool BurderingFlag => false;
-        public override bool BurderingEndlessMultiThreading => false;
     }
     public class ConfigrationTTTTT02 : ConfigrationCommon
     {
@@ -74,8 +69,6 @@ namespace WcfService
         private ConfigrationTTTTT02() { }
         public override string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.14";
         public override int Port => 6781;
-        public override bool BurderingFlag => false;
-        public override bool BurderingEndlessMultiThreading => false;
     }
 
     public static class ConfigrationFactory

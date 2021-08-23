@@ -17,13 +17,14 @@ namespace WcfService
     {
         public static void Main(string[] args)
         {
+            var logger = new WcfConsoleLogger();
             var serverCCCCC = new WcfServer(HostType.CCCCC);
             serverCCCCC.Start();
 
             var serverTTTTT01 = new WcfServer(HostType.TTTTT01);
             serverTTTTT01.Start();
 
-            var clientCCCCC = new WcfClient(HostType.TTTTT01);
+            var clientCCCCC = new WcfClient(HostType.CCCCC, HostType.TTTTT01);
             clientCCCCC.Open();
             var container = new DataContainer()
             {

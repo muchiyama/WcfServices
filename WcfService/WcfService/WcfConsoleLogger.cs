@@ -8,7 +8,7 @@ using WcfService.Contract.Structure;
 
 namespace WcfService
 {
-    public class WcfConsoleLogger : IWcfLogger, IWcfFormatter, ILogger
+    public class WcfConsoleLogger : IWcfLogger, IWcfFormatter, IAppLogger
     {
         private IWcfFormatter formatter = new WcfFormatter();
         public string Format(DataContainer container)
@@ -19,7 +19,7 @@ namespace WcfService
             Console.WriteLine(formatter.Format(container));
         }
 
-        void ILogger.Logging(string message)
+        void IAppLogger.Logging(string message)
         {
             Console.WriteLine(message);
         }
@@ -38,10 +38,10 @@ namespace WcfService
         }
 
         string IWcfFormatter.Format(DataContainer container)
-            => $"[{System.Threading.Thread.CurrentThread.ManagedThreadId}],Id=[{container.Id}],CmmunicationType=[{container.CommunicationType}],CmmunicationStatu=[{container.CommunicationStatus}],Sender=[{container.HostType}],SendTo=[{container.SendTo}],SendTime=[{container.SendTime.ToString("hh:mm:ss.ffff")}],SendOffset=[{container.SendTimeOffset}],RecieveTime=[{container.RecieveTime.ToString("hh:mm:ss.ffff")}],RecieveTimeOffSet=[{container.RecieveTimeOffSet}],ResponseTime=[{container.ResponseTime.ToString("hh:mm:ss.ffff")}],ResponseOffset=[{container.ResponseTimeOffset}],elapsedTime=[{m_stopWatch.Elapsed}]";
+            => $"[{System.Threading.Thread.CurrentThread.ManagedThreadId}],Id=[{container.Id}],CmmunicationType=[{container.CommunicationType}],CmmunicationStatus=[{container.CommunicationStatus}],RequestType=[{container.RequestType}],Sender=[{container.HostType}],SendTo=[{container.SendTo}],SendTime=[{container.SendTime.ToString("hh:mm:ss.ffff")}],SendOffset=[{container.SendTimeOffset}],RecieveTime=[{container.RecieveTime.ToString("hh:mm:ss.ffff")}],RecieveTimeOffSet=[{container.RecieveTimeOffSet}],CompletedTime=[{container.CompletedTime.ToString("hh:mm:ss.ffff")}],CompletedTimeOffset=[{container.CompletedTimeOffset}],DelayIntervalBetweenSendAndRecieve=[{container.DelayIntervalBetweenSendAndRecieve}],elapsedTime=[{m_stopWatch.Elapsed}],Now=[{DateTime.Now}]";
     }
 
-    public interface ILogger
+    public interface IAppLogger
     {
         void Logging(string message);
     }

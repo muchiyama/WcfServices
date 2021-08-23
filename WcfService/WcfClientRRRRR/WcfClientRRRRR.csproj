@@ -55,6 +55,10 @@
     <None Include="Dockerfile" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\WcfConsoleBase\WcfConsoleBase.csproj">
+      <Project>{13059DCB-F997-4E69-B98A-F38273BBEFDB}</Project>
+      <Name>WcfConsoleBase</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WcfService\WcfService.csproj">
       <Project>{D94366CF-22D6-402D-954D-8B4A06207AF3}</Project>
       <Name>WcfService</Name>

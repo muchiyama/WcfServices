@@ -14,12 +14,13 @@ namespace WcfService.Contract.Structure
         public HostType HostType { get; set; }
         public RequestType RequestType {  get; set; }
         public HostType SendTo { get; set; }
-        public DateTime SendTime { get; set; }
+        public DateTime SendTime { get; set; } = DateTime.MinValue;
         public TimeSpan SendTimeOffset => DateTime.Now - SendTime;
-        public DateTime RecieveTime { get; set; }
+        public DateTime RecieveTime { get; set; } = DateTime.MinValue;
         public TimeSpan RecieveTimeOffSet => DateTime.Now - RecieveTime;
-        public DateTime ResponseTime { get; set; }
-        public TimeSpan ResponseTimeOffset => DateTime.Now - ResponseTime;
+        public DateTime CompletedTime { get; set; } = DateTime.MinValue;
+        public TimeSpan CompletedTimeOffset => DateTime.Now - CompletedTime;
+        public TimeSpan DelayIntervalBetweenSendAndRecieve => RecieveTime - SendTime;
 
         public DataContainer Clone()
             => (DataContainer)MemberwiseClone();
@@ -60,18 +61,18 @@ namespace WcfService.Contract.Structure
     public class DataContainerRepository : IDataContainerRepository
     {
         public static DataContainerRepository m_instance = new DataContainerRepository();
-        public static DataContainer Create(HostType hostType, RequestType requestType)
-            => ((IDataContainerRepository)m_instance).Create(hostType, requestType);
+        public static DataContainer Create(HostType hostType, HostType sendTo, RequestType requestType)
+            => ((IDataContainerRepository)m_instance).Create(hostType, sendTo, requestType);
 
-        DataContainer IRepository<DataContainer>.Create(HostType hostType, RequestType requestType)
+        DataContainer IRepository<DataContainer>.Create(HostType hostType, HostType sendTo, RequestType requestType)
             => new DataContainer()
             {
                 Id = Guid.NewGuid(),
                 CommunicationType = CommunicationType.REQUEST,
                 CommunicationStatus = CommunicationStatus.SENDING,
-                HostType = HostType.RRRRR,
+                HostType = hostType,
                 RequestType = requestType,
-                SendTo = hostType,
+                SendTo = sendTo,
                 SendTime = DateTime.Now,
             };
     }
@@ -82,6 +83,6 @@ namespace WcfService.Contract.Structure
 
     public interface IRepository<TType>
     {
-        TType Create(HostType hostType, RequestType requestType);
+        TType Create(HostType hostType, HostType sendTo, RequestType requestType);
     }
 }

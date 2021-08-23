@@ -15,11 +15,7 @@ using WcfService.Contract.Structure;
 
 namespace WcfService.Server
 {
-    /// <summary>
-    /// wcfサーバー用
-    /// Interfaceは各起動設定用に用意
-    /// </summary>
-    public class WcfServer : IWcfServer, IWcfRecievable<DataContainer>, IDisposable
+    public class WcfServer : IWcfServer
     {
         internal static void StartServiceInternal<TType>(ref ServiceHost serviceHost, ASimplexService service, string ip, int port, Action<TType> action)
         {
@@ -37,15 +33,18 @@ namespace WcfService.Server
             switch (container.CommunicationType)
             {
                 case CommunicationType.REQUEST:
-                    container.RecieveTime = DateTime.Now;
+                    CreateClientsIfNotExist(container, server);
+                    container = WriteResponse(container, server.m_hostType);
+
+                    if (server.m_config.RecieveBurderingInterval > 0) Burdening.Wait(server.m_config.RecieveBurderingInterval);
 
                     WcfClient client = null;
-                    client = server.FetchWcfClient(container.HostType, server);
-                    container = WriteResponse(container, server.m_hostType);
+                    client = server.FetchWcfClient(container.SendTo, server);
 
                     client.SendData(container);
                     break;
                 case CommunicationType.RESPONSE:
+                    container.CompletedTime = DateTime.Now;
                     container.CommunicationStatus = CommunicationStatus.COMPLETED;
                     server.m_logger.Logging(container);
 
@@ -64,26 +63,37 @@ namespace WcfService.Server
             container.CommunicationStatus = CommunicationStatus.RECIEVED;
             container.SendTo = container.HostType;
             container.HostType = hostType;
-            container.ResponseTime = DateTime.Now;
+            container.RecieveTime = DateTime.Now;
 
             return container;
         }
 
-        private IWcfLogger m_logger = new WcfConsoleLogger();
-        private ILogger m_appLogger = new WcfConsoleLogger();
+        private ConcurrentDictionary<HostType, WcfClient> m_clients = new ConcurrentDictionary<HostType, WcfClient>();
         private ServiceHost m_serviceHost = null;
         private HostType m_hostType = HostType.None;
         private ConfigrationCommon m_config;
+        private readonly IWcfLogger m_logger = new WcfConsoleLogger();
+        private readonly IAppLogger m_appLogger = new WcfConsoleLogger();
 
-        internal ConcurrentDictionary<HostType, WcfClient> Clients = new ConcurrentDictionary<HostType, WcfClient>();
-        internal void CreateClientsIfNotExist(DataContainer container)
+        public void Recieve(DataContainer container)
         {
-            if (!Clients.ContainsKey(container.HostType))
+            try
+            {
+                RecieveInternal(container, this);
+            }
+            catch (Exception ex)
+            {
+                m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            }
+        }
+        internal static void CreateClientsIfNotExist(DataContainer container, WcfServer server)
+        {
+            if (!server.m_clients.ContainsKey(container.HostType))
                 while (true)
                 {
-                    var client = new WcfClient(container.HostType);
+                    var client = new WcfClient(server.m_hostType, container.HostType);
                     client.Open();
-                    var isSuccecced = Clients.TryAdd(container.HostType, client);
+                    var isSuccecced = server.m_clients.TryAdd(container.HostType, client);
                     if (isSuccecced) break;
                 }
         }
@@ -92,7 +102,7 @@ namespace WcfService.Server
             while (true)
             {
                 WcfClient client;
-                var isSucceeded = server.Clients.TryGetValue(type, out client);
+                var isSucceeded = server.m_clients.TryGetValue(type, out client);
                 if (isSucceeded) return client;
             }
         }
@@ -101,50 +111,18 @@ namespace WcfService.Server
             m_hostType = hostType;
             m_config = ConfigrationFactory.GetConfig(m_hostType);
         }
-
-        public void Recieve(DataContainer container)
-        {
-            try
-            {
-                m_logger.Logging(container);
-                CreateClientsIfNotExist(container);
-                RecieveInternal(container, this);
-            }
-            catch (Exception ex)
-            {
-                m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            }
-        }
-
-        /// <summary>
-        /// server status
-        /// </summary>
-        /// <returns></returns>
-        public string Stauts()
-        {
-            return m_serviceHost.State.ToString();
-        }
-
+        public string Status()
+            => m_serviceHost.State.ToString();
         public void Start()
         {
             SimplexService simplexService = new SimplexService();
             simplexService.RaiseEventHandler = Recieve;
             StartServiceInternal(ref m_serviceHost, simplexService, m_config.Ip, m_config.Port, (Action<DataContainer>)simplexService.Action);
         }
-
-        public void Dispose()
-        {
-            m_serviceHost.Close();
-        }
     }
 
     public interface IWcfServer
     {
         void Start();
-    }
-
-    public interface IWcfRecievable<TContainer> where TContainer : WcfService.Contract.Structure.IContainer
-    {
-        void Recieve(TContainer container);
     }
 }

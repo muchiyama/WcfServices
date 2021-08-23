@@ -9,8 +9,7 @@ namespace WcfService
 {
     public static class Burdening
     {
-        static private ILogger m_logger = new WcfConsoleLogger();
-        public static void Burden()
+        public static void Burden(int milisecound)
         {
                 Task.Run(async () =>
                 {
@@ -19,16 +18,16 @@ namespace WcfService
                         Parallel.ForEach(new List<int> { 1, 2 }, async l =>
                         {
                             // 2loops
-                            await Task.Delay(1000);
+                            await Task.Delay(milisecound);
                         });
-                        await Task.Delay(ConfigrationCommon.Config.WaitIntervalForTimer);
+                        await Task.Delay(ConfigrationCommon.Config.WaitIntervalForSendTimer);
                     }  
                 });
         }
 
-        public static void Wait10Secound()
+        public static void Wait(int milisecound)
         {
-            var limit = new TimeSpan(0, 0, 0, 10);
+            var limit = new TimeSpan(0, 0, 0, 0, milisecound);
             var stopWatch = new System.Diagnostics.Stopwatch();
             stopWatch.Start();
 
@@ -36,33 +35,6 @@ namespace WcfService
             {
 
             }
-        }
-
-        public static void BurdeningWithEndlessMultiThreading()
-        {
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    var list = new List<int>();
-                    for (var i = 0; i < 10000000; i++)
-                    {
-                        list.Add(i);
-                    }
-
-                    Parallel.ForEach(list, f =>
-                    {
-                        var limit = new TimeSpan(0, 0, 0, 10);
-                        var stopWatch = new System.Diagnostics.Stopwatch();
-                        stopWatch.Start();
-
-                        while (stopWatch.Elapsed < limit)
-                        {
-
-                        }
-                    });
-                }
-            });
         }
     }
 }

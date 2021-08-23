@@ -10,9 +10,9 @@ using WcfService.Contract.Structure;
 
 namespace WcfService.Client
 {
-    public class WcfClient : IWcfClient, IWcfSendable<DataContainer>, IWcfSendableWithCloneDataContainer<DataContainer>
+    public class WcfClient : IWcfClient<DataContainer>
     {
-        private static ILogger m_appLogger = new WcfConsoleLogger();
+        private static IAppLogger m_appLogger = new WcfConsoleLogger();
         internal static void OpenClientChannelInternal<TType>(ref IClientChannel ic, string ip, int port, Action<TType> service)
         {
             try
@@ -48,12 +48,18 @@ namespace WcfService.Client
             }
         }
 
+        private HostType m_hostType;
+        private HostType m_sendTo;
         private IWcfLogger m_logger = new WcfConsoleLogger();
         private ConfigrationCommon m_config;
+        private ConfigrationCommon m_sendToConfig;
         private IClientChannel m_Clientchannel = null;
-        public WcfClient(HostType sendTo)
+        public WcfClient(HostType hostType, HostType sendTo)
         {
-            m_config = ConfigrationFactory.GetConfig(sendTo);
+            m_hostType = hostType;
+            m_sendTo = sendTo;
+            m_config = ConfigrationFactory.GetConfig(hostType);
+            m_sendToConfig = ConfigrationFactory.GetConfig(sendTo);
         }
 
         public void Open()
@@ -61,7 +67,7 @@ namespace WcfService.Client
             try
             {
                 ISimplexService service = new SimplexService();
-                OpenClientChannelInternal(ref m_Clientchannel, m_config.Ip, m_config.Port, (Action<DataContainer>)service.Action);
+                OpenClientChannelInternal(ref m_Clientchannel, m_sendToConfig.Ip, m_sendToConfig.Port, (Action<DataContainer>)service.Action);
             }
             catch (Exception ex)
             {
@@ -74,6 +80,9 @@ namespace WcfService.Client
             try
             {
                 m_logger.Logging(container);
+
+                if (m_config.SendBurderingInterval > 0) Burdening.Wait(m_config.SendBurderingInterval);
+
                 ISimplexService proxy = (ISimplexService)m_Clientchannel;
                 SendDataInternal(proxy, proxy.Action, container, ConfigrationCommon.Config.TimeOut);
             }
@@ -84,15 +93,16 @@ namespace WcfService.Client
             }
         }
 
-        public void SendDataWithCloneDataContainer(DataContainer container)
+        public void SendData(DataContainer container, int miliSeconds)
         {
             try
             {
-                var cpContainer = container.Clone();
+                m_logger.Logging(container);
 
-                m_logger.Logging(cpContainer);
+                if (m_config.SendBurderingInterval > 0) Burdening.Wait(m_config.SendBurderingInterval);
+
                 ISimplexService proxy = (ISimplexService)m_Clientchannel;
-                SendDataInternal(proxy, proxy.Action, cpContainer, m_config.TimeOut + m_config.AdditionalTimeOutWhenSendWithClone);
+                SendDataInternal(proxy, proxy.Action, container, ConfigrationCommon.Config.TimeOut + new TimeSpan(0, 0, 0, 0, miliSeconds));
             }
 
             catch (Exception ex)
@@ -103,18 +113,16 @@ namespace WcfService.Client
 
         public string Status
             => m_Clientchannel.State.ToString();
+
+        public HostType HostType => m_hostType;
+        public HostType SendTo => m_sendTo;
     }
-    public interface IWcfClient
+    public interface IWcfClient<TContinaer> where TContinaer : IContainer
     {
         void Open();
-    }
-    public interface IWcfSendable<TContinaer> where TContinaer : IContainer
-    {
         void SendData(TContinaer container);
-    }
-
-    public interface IWcfSendableWithCloneDataContainer<TContinaer> where TContinaer : IContainer
-    {
-        void SendDataWithCloneDataContainer(TContinaer container);
+        void SendData(TContinaer container, int miliSeconds);
+        HostType HostType { get; }
+        HostType SendTo { get; }
     }
 }

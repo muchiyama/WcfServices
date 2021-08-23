@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WcfConsoleBase.ServerService;
 using WcfService;
 using WcfService.Client;
 using WcfService.Contract.Structure;
@@ -14,41 +15,35 @@ namespace WcfServerTTTTT02
 {
     class Program
     {
-        static private ILogger m_logger = new WcfConsoleLogger();
-        static private ConfigrationCommon m_config = ConfigrationFactory.GetConfig(HostType.TTTTT02);
+        private static IWcfConsoleApplicationServer m_server;
+        private static HostType m_hostType = HostType.TTTTT02;
+        private static CancellationTokenSource TokenSource = new CancellationTokenSource();
+
         static async Task Main(string[] args)
         {
-            await StartUp();
+            StartUp();
             await ExecuteAsync(TokenSource.Token);
         }
 
         static async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-
             while (!stoppingToken.IsCancellationRequested)
-            {
-                m_logger.Logging($"server running on {Server.Stauts()} status...");
-                await Task.Delay(m_config.WaitIntervalForTimer);
-            }
+                await Task.Delay(10000);
         }
 
-        static async Task StartUp()
+        static void StartUp()
         {
-            Server.Start();
+            m_server = WcfConsoleApplicationServer.Create(
+                    server: new WcfServer(m_hostType),
+                    hostType: m_hostType
+                );
 
-            Console.WriteLine("IWcfServerTTTTT02 server started");
-            Console.WriteLine("wating for IWcfServerTTTTT02 starting service.....");
-            await Task.Delay(10000);
-            Console.WriteLine("start to service IWcfServerTTTTT02");
+            m_server.Start();
             Console.CancelKeyPress += (sender, eventArgs) =>
             {
                 TokenSource.Cancel();
-                Server.Dispose();
                 ShutDown();
             };
-
-            if(m_config.BurderingFlag) Burdening.Burden();
-            if (m_config.BurderingEndlessMultiThreading) Burdening.BurdeningWithEndlessMultiThreading();
         }
 
         [STAThread]
@@ -56,8 +51,5 @@ namespace WcfServerTTTTT02
         {
             Environment.Exit(0);
         }
-
-        private static WcfServer Server = new WcfServer(HostType.TTTTT02);
-        private static CancellationTokenSource TokenSource = new CancellationTokenSource();
     }
 }
