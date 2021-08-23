@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WcfService.Contract.Structure;
 
 namespace WcfService
 {
@@ -17,60 +18,83 @@ namespace WcfService
     }
     public class ConfigrationCommon : IConfigration
     {
-        public static ConfigrationCommon Config
+        internal static ConfigrationCommon Config
             => Configration;
         private static ConfigrationCommon Configration { get; set; } = new ConfigrationCommon();
-        //public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 5);
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 1, 5);
-        public int WaitForExecuteAsync => 5000;
-        public bool BurderingFlag => true;
+        public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 5);
+        public TimeSpan AdditionalTimeOutWhenSendWithClone => new TimeSpan(0, 0, 0, 30);
+        public int WaitIntervalForTimer => 5000;
+        public int WaitIntervalForAdditionalSend => 5000;
         internal static TargetRunningEnvironment RunningEnv => TargetEnv == "docker" ? TargetRunningEnvironment.DockerWindowsKernel : TargetRunningEnvironment.Windows;
         internal static string TargetEnv => Environment.GetEnvironmentVariable("runninngEnv");
+        public virtual string Ip => string.Empty;
+        public virtual int Port => 6782;
+        public virtual bool BurderingFlag => false;
+        public virtual bool BurderingEndlessMultiThreading => false;
     }
-    public class ConfigrationCCCCC : IConfigration
+    public class ConfigrationCCCCC : ConfigrationCommon
     {
-        public static ConfigrationCCCCC Config
+        internal static new ConfigrationCCCCC Config
             => Configration;
         private static ConfigrationCCCCC Configration { get; set; } = new ConfigrationCCCCC();
-
         private ConfigrationCCCCC() { }
-        //public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 1, 5);
-        public string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.11";
-        public int Port => 6782;
+        public override string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.11";
+        public override int Port => 6782;
+        public override bool BurderingFlag => false;
+        public override bool BurderingEndlessMultiThreading => false;
     }
-    public class ConfigrationRRRRR : IConfigration
+    public class ConfigrationRRRRR : ConfigrationCommon
     {
-        public static ConfigrationRRRRR Config
+        internal static new ConfigrationRRRRR Config
             => Configration;
         private static ConfigrationRRRRR Configration { get; set; } = new ConfigrationRRRRR();
 
         private ConfigrationRRRRR() { }
-        //public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 1, 5);
-        public string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.12";
-        public int Port => 6783;
+        public override string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.12";
+        public override int Port => 6783;
+        public override bool BurderingFlag => false;
+        public override bool BurderingEndlessMultiThreading => false;
     }
-    public class ConfigrationTTTTT01 : IConfigration
+    public class ConfigrationTTTTT01 : ConfigrationCommon
     {
-        public static ConfigrationTTTTT01 Config
+        internal static new ConfigrationTTTTT01 Config
             => Configration;
         private static ConfigrationTTTTT01 Configration { get; set; } = new ConfigrationTTTTT01();
         private ConfigrationTTTTT01() { }
-        //public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 1, 5);
-        public string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.13";
-        public int Port => 6780;
+        public override string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.13";
+        public override int Port => 6780;
+        public override bool BurderingFlag => false;
+        public override bool BurderingEndlessMultiThreading => false;
     }
-    public class ConfigrationTTTTT02 : IConfigration
+    public class ConfigrationTTTTT02 : ConfigrationCommon
     {
-        public static ConfigrationTTTTT02 Config
+        internal static new ConfigrationTTTTT02 Config
             => Configration;
         private static ConfigrationTTTTT02 Configration { get; set; } = new ConfigrationTTTTT02();
         private ConfigrationTTTTT02() { }
-        //public TimeSpan TimeOut => new TimeSpan(0, 0, 0, 10);
-        public TimeSpan TimeOut => new TimeSpan(0, 0, 1, 5);
-        public string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.14";
-        public int Port => 6781;
+        public override string Ip => ConfigrationCommon.RunningEnv == TargetRunningEnvironment.Windows ? "localhost" : "197.168.10.14";
+        public override int Port => 6781;
+        public override bool BurderingFlag => false;
+        public override bool BurderingEndlessMultiThreading => false;
+    }
+
+    public static class ConfigrationFactory
+    {
+        public static ConfigrationCommon GetConfig(HostType type)
+        {
+            switch (type)
+            {
+                case HostType.CCCCC:
+                    return ConfigrationCCCCC.Config;
+                case HostType.RRRRR:
+                    return ConfigrationRRRRR.Config;
+                case HostType.TTTTT01:
+                    return ConfigrationTTTTT01.Config;
+                case HostType.TTTTT02:
+                    return ConfigrationTTTTT02.Config;
+                default:
+                    return null;
+            }
+        }
     }
 }

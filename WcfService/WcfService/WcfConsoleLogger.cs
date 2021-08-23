@@ -11,7 +11,6 @@ namespace WcfService
     public class WcfConsoleLogger : IWcfLogger, IWcfFormatter, ILogger
     {
         private IWcfFormatter formatter = new WcfFormatter();
-
         public string Format(DataContainer container)
             =>  formatter.Format(container);
 
@@ -28,8 +27,18 @@ namespace WcfService
 
     public class WcfFormatter : IWcfFormatter
     {
+        private static System.Diagnostics.Stopwatch m_stopWatch = null;
+        public WcfFormatter()
+        {
+            if(m_stopWatch == null)
+            {
+                m_stopWatch = new System.Diagnostics.Stopwatch();
+                m_stopWatch.Start();
+            }
+        }
+
         string IWcfFormatter.Format(DataContainer container)
-            => $"[{System.Threading.Thread.CurrentThread.ManagedThreadId}] | Id=[{container.Id}] | CmmunicationType=[{container.CommunicationType}] | CmmunicationStatu=[{container.CommunicationStatus}] | Sender=[{container.HostType}] | SendTo={container.SendTo} | SendTime=[{container.SendTime.ToString("hh:mm:ss.ffff")} | SendOffset=[{container.SendTimeOffset} | RecieveTime=[{container.RecieveTime}] | RecieveTimeOffSet=[{container.RecieveTimeOffSet}] | ResponseTime=[{container.ResponseTime.ToString("hh:mm:ss.ffff")}] | ResponseOffset=[{container.ResponseTimeOffset}]]";
+            => $"[{System.Threading.Thread.CurrentThread.ManagedThreadId}],Id=[{container.Id}],CmmunicationType=[{container.CommunicationType}],CmmunicationStatu=[{container.CommunicationStatus}],Sender=[{container.HostType}],SendTo=[{container.SendTo}],SendTime=[{container.SendTime.ToString("hh:mm:ss.ffff")}],SendOffset=[{container.SendTimeOffset}],RecieveTime=[{container.RecieveTime.ToString("hh:mm:ss.ffff")}],RecieveTimeOffSet=[{container.RecieveTimeOffSet}],ResponseTime=[{container.ResponseTime.ToString("hh:mm:ss.ffff")}],ResponseOffset=[{container.ResponseTimeOffset}],elapsedTime=[{m_stopWatch.Elapsed}]";
     }
 
     public interface ILogger

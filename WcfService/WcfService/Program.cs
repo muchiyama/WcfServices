@@ -18,13 +18,13 @@ namespace WcfService
         public static void Main(string[] args)
         {
             var serverCCCCC = new WcfServer(HostType.CCCCC);
-            ((IWcfServerCCCCC)serverCCCCC).Start();
+            serverCCCCC.Start();
 
             var serverTTTTT01 = new WcfServer(HostType.TTTTT01);
-            ((IWcfServerTTTTT01)serverTTTTT01).Start();
+            serverTTTTT01.Start();
 
-            var clientCCCCC = new WcfClient();
-            ((IWcfClientToTTTTT01)clientCCCCC).Open();
+            var clientCCCCC = new WcfClient(HostType.TTTTT01);
+            clientCCCCC.Open();
             var container = new DataContainer()
             {
                 Id = Guid.NewGuid(),

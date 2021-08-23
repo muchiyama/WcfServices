@@ -14,69 +14,85 @@ namespace WcfClientRRRRR
 {
     class Program
     {
-        static private readonly ILogger m_logger = new WcfConsoleLogger();
+        private static readonly ILogger m_logger = new WcfConsoleLogger();
+        private static readonly ConfigrationCommon m_config = ConfigrationFactory.GetConfig(HostType.RRRRR);
+        internal static readonly HostType m_HostType = HostType.RRRRR;
+        internal static List<IClientTaskExecuter> ServiceCollection { get; set; } = new List<IClientTaskExecuter>();
+        private static ConcurrentDictionary<HostType, WcfClient> Clients = new ConcurrentDictionary<HostType, WcfClient>();
+        private static WcfServer Server = new WcfServer(m_HostType);
+        internal static System.Timers.Timer m_timer;
+        private static CancellationTokenSource TokenSource { get; set; } = new CancellationTokenSource();
         static async Task Main(string[] args)
         {
             await StartUp();
-            await ExecuteAsync(TokenSource.Token);
+            ServiceCollection.ForEach(f => f.Start());
+
+            while (!TokenSource.IsCancellationRequested)
+                await Task.Delay(10000);
         }
 
-        static async Task ExecuteAsync(CancellationToken stoppingToken)
+        static void ExecuteAsyncWithTimer()
         {
-            if (ConfigrationCommon.Config.BurderingFlag) Burdening.Burden();
-
-            while (!stoppingToken.IsCancellationRequested)
+            m_timer = new System.Timers.Timer(m_config.WaitIntervalForTimer);
+            m_timer.Elapsed += (sender, e) =>
             {
                 Parallel.ForEach(Clients, c =>
                 {
-                    var container = new DataContainer()
-                    {
-                        Id = Guid.NewGuid(),
-                        CommunicationType = CommunicationType.REQUEST,
-                        CommunicationStatus = CommunicationStatus.Sending,
-                        HostType = HostType.RRRRR,
-                        SendTo = c.Key == typeof(IWcfClientToTTTTT01) ? HostType.TTTTT01 : HostType.TTTTT02,
-                        SendTime = DateTime.Now,
-                    };
-
-                    c.Value.SendData(container);
+                    c.Value.SendData(DataContainerRepository.Create(m_HostType, RequestType.NORMAL));
                 });
 
                 m_logger.Logging($"server running on {Server.Stauts()} status...");
                 m_logger.Logging($"client{Clients.FirstOrDefault().Key}: {Clients.FirstOrDefault().Value.Status}");
                 m_logger.Logging($"client{Clients.LastOrDefault().Key}: {Clients.LastOrDefault().Value.Status}");
-                await Task.Delay(ConfigrationCommon.Config.WaitForExecuteAsync);
+            };
+
+            m_timer.Start();
+        }
+
+        static async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                Parallel.ForEach(Clients, c =>
+                {
+                    c.Value.SendData(DataContainerRepository.Create(m_HostType, RequestType.NORMAL));
+                });
+
+                m_logger.Logging($"server running on {Server.Stauts()} status...");
+                m_logger.Logging($"client{Clients.FirstOrDefault().Key}: {Clients.FirstOrDefault().Value.Status}");
+                m_logger.Logging($"client{Clients.LastOrDefault().Key}: {Clients.LastOrDefault().Value.Status}");
+                await Task.Delay(m_config.WaitIntervalForTimer);
             }
         }
         static async Task StartUp()
         {
-            ((IWcfServerRRRRR)Server).Start();
+            Server.Start();
 
             Console.WriteLine("IWcfServerRRRRR server started");
             Console.WriteLine("wating for IWcfServerRRRRR starting service.....");
             await Task.Delay(10000);
             Console.WriteLine("start to service IWcfServerRRRRR");
 
-            while (true)
+            new List<HostType> { HostType.TTTTT01, HostType.TTTTT02 }.ForEach(type =>
             {
-                var client = new WcfClient();
-                ((IWcfClientToTTTTT01)client).Open();
-                var result = Clients.TryAdd(typeof(IWcfClientToTTTTT01), client);
-                if (result) break;
-            }
-            while (true)
-            {
-                var client = new WcfClient();
-                ((IWcfClientToTTTTT02)client).Open();
-                var result = Clients.TryAdd(typeof(IWcfClientToTTTTT02), client);
-                if (result) break;
-            }
+                while (true)
+                {
+                    var client = new WcfClient(type);
+                    client.Open();
+                    var result = Clients.TryAdd(type, client);
+                    if (result) break;
+                }
+            });
+
             Console.CancelKeyPress += (sender, eventArgs) =>
             {
                 TokenSource.Cancel();
                 Server.Dispose();
                 ShutDown();
             };
+
+            if (m_config.BurderingFlag) Burdening.Burden();
+            if (m_config.BurderingEndlessMultiThreading) Burdening.BurdeningWithEndlessMultiThreading();
         }
 
         [STAThread]
@@ -85,8 +101,25 @@ namespace WcfClientRRRRR
             Environment.Exit(0);
         }
 
-        private static ConcurrentDictionary<Type, WcfClient> Clients = new ConcurrentDictionary<Type, WcfClient>();
-        private static WcfServer Server = new WcfServer(HostType.RRRRR);
-        private static CancellationTokenSource TokenSource { get; set; } = new CancellationTokenSource();
+        public interface IClientTaskExecuter
+        {
+            void Start();
+        }
+
+        public class SnedSimpleMessageTimerExecuter : IClientTaskExecuter
+        {
+            public void Start()
+            {
+                Program.ExecuteAsyncWithTimer();
+            }
+        }
+
+        public class SnedSimpleMessageWorkerExecuter : IClientTaskExecuter
+        {
+            public async void Start()
+            {
+                await Program.ExecuteAsync(Program.TokenSource.Token);
+            }
+        }
     }
 }

@@ -10,7 +10,7 @@ using WcfService.Contract.Structure;
 
 namespace WcfService.Client
 {
-    public class WcfClient : IWcfClientToCCCCC, IWcfClientToRRRRR, IWcfClientToTTTTT01, IWcfClientToTTTTT02
+    public class WcfClient : IWcfClient, IWcfSendable<DataContainer>, IWcfSendableWithCloneDataContainer<DataContainer>
     {
         private static ILogger m_appLogger = new WcfConsoleLogger();
         internal static void OpenClientChannelInternal<TType>(ref IClientChannel ic, string ip, int port, Action<TType> service)
@@ -23,7 +23,7 @@ namespace WcfService.Client
                         new EndpointAddress($"net.tcp://{ip}:{port}/sample.wcf.service/{service.Method.Name}")
                     );
                 ic = proxy as IClientChannel;
-                ic.OperationTimeout = ConfigrationCCCCC.Config.TimeOut;
+                ic.OperationTimeout = ConfigrationCommon.Config.TimeOut;
                 ic.Open();
             }
             catch (Exception ex)
@@ -49,30 +49,19 @@ namespace WcfService.Client
         }
 
         private IWcfLogger m_logger = new WcfConsoleLogger();
+        private ConfigrationCommon m_config;
         private IClientChannel m_Clientchannel = null;
-        public WcfClient()
+        public WcfClient(HostType sendTo)
         {
+            m_config = ConfigrationFactory.GetConfig(sendTo);
         }
 
-        void IWcfClientToCCCCC.Open()
+        public void Open()
         {
             try
             {
                 ISimplexService service = new SimplexService();
-                OpenClientChannelInternal(ref m_Clientchannel, ConfigrationCCCCC.Config.Ip, ConfigrationCCCCC.Config.Port, (Action<DataContainer>)service.Action);
-            }
-            catch (Exception ex)
-            {
-                m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            }
-        }
-
-        void IWcfClientToRRRRR.Open()
-        {
-            try
-            {
-                ISimplexService service = new SimplexService();
-                OpenClientChannelInternal(ref m_Clientchannel, ConfigrationRRRRR.Config.Ip, ConfigrationRRRRR.Config.Port, (Action<DataContainer>)service.Action);
+                OpenClientChannelInternal(ref m_Clientchannel, m_config.Ip, m_config.Port, (Action<DataContainer>)service.Action);
             }
             catch (Exception ex)
             {
@@ -80,30 +69,6 @@ namespace WcfService.Client
             }
         }
 
-        void IWcfClientToTTTTT01.Open()
-        {
-            try
-            {
-                ISimplexService service = new SimplexService();
-                OpenClientChannelInternal(ref m_Clientchannel, ConfigrationTTTTT01.Config.Ip, ConfigrationTTTTT01.Config.Port, (Action<DataContainer>)service.Action);
-            }
-            catch (Exception ex)
-            {
-                m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            }
-        }
-        void IWcfClientToTTTTT02.Open()
-        {
-            try
-            {
-                ISimplexService service = new SimplexService();
-                OpenClientChannelInternal(ref m_Clientchannel, ConfigrationTTTTT02.Config.Ip, ConfigrationTTTTT02.Config.Port, (Action<DataContainer>)service.Action);
-            }
-            catch (Exception ex)
-            {
-                m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            }
-        }
         public void SendData(DataContainer container)
         {
             try
@@ -119,24 +84,37 @@ namespace WcfService.Client
             }
         }
 
+        public void SendDataWithCloneDataContainer(DataContainer container)
+        {
+            try
+            {
+                var cpContainer = container.Clone();
+
+                m_logger.Logging(cpContainer);
+                ISimplexService proxy = (ISimplexService)m_Clientchannel;
+                SendDataInternal(proxy, proxy.Action, cpContainer, m_config.TimeOut + m_config.AdditionalTimeOutWhenSendWithClone);
+            }
+
+            catch (Exception ex)
+            {
+                m_appLogger.Logging($"{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            }
+        }
+
         public string Status
             => m_Clientchannel.State.ToString();
     }
+    public interface IWcfClient
+    {
+        void Open();
+    }
+    public interface IWcfSendable<TContinaer> where TContinaer : IContainer
+    {
+        void SendData(TContinaer container);
+    }
 
-    public interface IWcfClientToCCCCC
+    public interface IWcfSendableWithCloneDataContainer<TContinaer> where TContinaer : IContainer
     {
-        void Open();
-    }
-    public interface IWcfClientToRRRRR
-    {
-        void Open();
-    }
-    public interface IWcfClientToTTTTT01
-    {
-        void Open();
-    }
-    public interface IWcfClientToTTTTT02
-    {
-        void Open();
+        void SendDataWithCloneDataContainer(TContinaer container);
     }
 }

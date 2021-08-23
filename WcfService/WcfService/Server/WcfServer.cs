@@ -6,6 +6,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using WcfService.Client;
 using WcfService.Contract;
 using WcfService.Contract.Abstruct;
@@ -18,7 +19,7 @@ namespace WcfService.Server
     /// wcfサーバー用
     /// Interfaceは各起動設定用に用意
     /// </summary>
-    public class WcfServer : IWcfServerTTTTT01, IWcfServerTTTTT02, IWcfServerCCCCC, IWcfServerRRRRR, IDisposable
+    public class WcfServer : IWcfServer, IWcfRecievable<DataContainer>, IDisposable
     {
         internal static void StartServiceInternal<TType>(ref ServiceHost serviceHost, ASimplexService service, string ip, int port, Action<TType> action)
         {
@@ -31,53 +32,6 @@ namespace WcfService.Server
             serviceHost.Open();
         }
 
-        internal void CreateClientsIfNotExist(DataContainer container)
-        {
-            switch (container.HostType)
-            {
-                case HostType.CCCCC:
-                    if (!Clients.ContainsKey(typeof(IWcfClientToCCCCC)))
-                        while (true)
-                        {
-                            var client = new WcfClient();
-                            ((IWcfClientToCCCCC)client).Open();
-                            var isSuccecced = Clients.TryAdd(typeof(IWcfClientToCCCCC), client);
-                            if (isSuccecced) break;
-                        }
-                    break;
-                case HostType.RRRRR:
-                    if (!Clients.ContainsKey(typeof(IWcfClientToRRRRR)))
-                        while (true)
-                        {
-                            var client = new WcfClient();
-                            ((IWcfClientToRRRRR)client).Open();
-                            var isSuccecced = Clients.TryAdd(typeof(IWcfClientToRRRRR), client);
-                            if (isSuccecced) break;
-                        }
-                    break;
-                case HostType.TTTTT01:
-                    if (!Clients.ContainsKey(typeof(IWcfClientToTTTTT01)))
-                        while (true)
-                        {
-                            var client = new WcfClient();
-                            ((IWcfClientToTTTTT01)client).Open();
-                            var isSuccecced = Clients.TryAdd(typeof(IWcfClientToTTTTT01), client);
-                            if (isSuccecced) break;
-                        }
-                    break;
-                case HostType.TTTTT02:
-                    if (!Clients.ContainsKey(typeof(IWcfClientToTTTTT02)))
-                        while (true)
-                        {
-                            var client = new WcfClient();
-                            ((IWcfClientToTTTTT02)client).Open();
-                            var isSuccecced = Clients.TryAdd(typeof(IWcfClientToTTTTT02), client);
-                            if (isSuccecced) break;
-                        }
-                    break;
-            }
-        }
-
         internal static void RecieveInternal(DataContainer container, WcfServer server)
         {
             switch (container.CommunicationType)
@@ -86,21 +40,13 @@ namespace WcfService.Server
                     container.RecieveTime = DateTime.Now;
 
                     WcfClient client = null;
-                    if (container.HostType == HostType.CCCCC) client = FetchWcfClient(typeof(IWcfClientToCCCCC), server);
-                    else if (container.HostType == HostType.RRRRR) client = FetchWcfClient(typeof(IWcfClientToRRRRR), server);
-                    else if (container.HostType == HostType.TTTTT01) client = FetchWcfClient(typeof(IWcfClientToTTTTT01), server);
-                    else if (container.HostType == HostType.TTTTT01) client = FetchWcfClient(typeof(IWcfClientToTTTTT02), server);
-                    
-                    container.CommunicationType = CommunicationType.RESPONSE;
-                    container.CommunicationStatus = CommunicationStatus.Recieved;
-                    container.SendTo = container.HostType;
-                    container.HostType = server.m_hostType;
-                    container.ResponseTime = DateTime.Now;
+                    client = server.FetchWcfClient(container.HostType, server);
+                    container = WriteResponse(container, server.m_hostType);
 
                     client.SendData(container);
                     break;
                 case CommunicationType.RESPONSE:
-                    container.CommunicationStatus = CommunicationStatus.Completed;
+                    container.CommunicationStatus = CommunicationStatus.COMPLETED;
                     server.m_logger.Logging(container);
 
                     if (DateTime.Now - container.SendTime > ConfigrationCommon.Config.TimeOut)
@@ -112,7 +58,36 @@ namespace WcfService.Server
             }
         }
 
-        internal static WcfClient FetchWcfClient(Type type, WcfServer server)
+        internal static DataContainer WriteResponse(DataContainer container, HostType hostType)
+        {
+            container.CommunicationType = CommunicationType.RESPONSE;
+            container.CommunicationStatus = CommunicationStatus.RECIEVED;
+            container.SendTo = container.HostType;
+            container.HostType = hostType;
+            container.ResponseTime = DateTime.Now;
+
+            return container;
+        }
+
+        private IWcfLogger m_logger = new WcfConsoleLogger();
+        private ILogger m_appLogger = new WcfConsoleLogger();
+        private ServiceHost m_serviceHost = null;
+        private HostType m_hostType = HostType.None;
+        private ConfigrationCommon m_config;
+
+        internal ConcurrentDictionary<HostType, WcfClient> Clients = new ConcurrentDictionary<HostType, WcfClient>();
+        internal void CreateClientsIfNotExist(DataContainer container)
+        {
+            if (!Clients.ContainsKey(container.HostType))
+                while (true)
+                {
+                    var client = new WcfClient(container.HostType);
+                    client.Open();
+                    var isSuccecced = Clients.TryAdd(container.HostType, client);
+                    if (isSuccecced) break;
+                }
+        }
+        internal WcfClient FetchWcfClient(HostType type, WcfServer server)
         {
             while (true)
             {
@@ -121,32 +96,12 @@ namespace WcfService.Server
                 if (isSucceeded) return client;
             }
         }
-
-        /// <summary>
-        /// for DataContainer logger
-        /// </summary>
-        private IWcfLogger m_logger = new WcfConsoleLogger();
-        /// <summary>
-        /// for message logger
-        /// </summary>
-        private ILogger m_appLogger = new WcfConsoleLogger();
-        private ServiceHost m_serviceHost = null;
-        private HostType m_hostType = HostType.None;
-        internal ConcurrentDictionary<Type, WcfClient> Clients = new ConcurrentDictionary<Type, WcfClient>();
-
-        /// <summary>
-        /// contructor
-        /// </summary>
-        /// <param name="hostType"></param>
         public WcfServer(HostType hostType)
         {
             m_hostType = hostType;
+            m_config = ConfigrationFactory.GetConfig(m_hostType);
         }
 
-        /// <summary>
-        /// on recieved action
-        /// </summary>
-        /// <param name="container"></param>
         public void Recieve(DataContainer container)
         {
             try
@@ -170,34 +125,11 @@ namespace WcfService.Server
             return m_serviceHost.State.ToString();
         }
 
-        void IWcfServerTTTTT01.Start()
+        public void Start()
         {
             SimplexService simplexService = new SimplexService();
             simplexService.RaiseEventHandler = Recieve;
-            StartServiceInternal(ref m_serviceHost, simplexService, ConfigrationTTTTT01.Config.Ip, ConfigrationTTTTT01.Config.Port, (Action<DataContainer>)simplexService.Action);
-        }
-
-        void IWcfServerTTTTT02.Start()
-        {
-            SimplexService simplexService = new SimplexService();
-            simplexService.RaiseEventHandler = Recieve;
-            StartServiceInternal(ref m_serviceHost, simplexService, ConfigrationTTTTT02.Config.Ip, ConfigrationTTTTT02.Config.Port, (Action<DataContainer>)simplexService.Action);
-        }
-
-        void IWcfServerCCCCC.Start()
-        {
-            SimplexService simplexService = new SimplexService();
-            simplexService.RaiseEventHandler = Recieve;
-            StartServiceInternal(ref m_serviceHost, simplexService, ConfigrationCCCCC.Config.Ip, ConfigrationCCCCC.Config.Port, (Action<DataContainer>)simplexService.Action);
-        }
-        /// <summary>
-        /// start listen and setting on recieve action
-        /// </summary>
-        void IWcfServerRRRRR.Start()
-        {
-            SimplexService simplexService = new SimplexService();
-            simplexService.RaiseEventHandler = Recieve;
-            StartServiceInternal(ref m_serviceHost, simplexService, ConfigrationRRRRR.Config.Ip, ConfigrationRRRRR.Config.Port, (Action<DataContainer>)simplexService.Action);
+            StartServiceInternal(ref m_serviceHost, simplexService, m_config.Ip, m_config.Port, (Action<DataContainer>)simplexService.Action);
         }
 
         public void Dispose()
@@ -206,23 +138,13 @@ namespace WcfService.Server
         }
     }
 
-    public interface IWcfServerTTTTT01
+    public interface IWcfServer
     {
         void Start();
     }
 
-    public interface IWcfServerTTTTT02
+    public interface IWcfRecievable<TContainer> where TContainer : WcfService.Contract.Structure.IContainer
     {
-        void Start();
-    }
-
-    public interface IWcfServerCCCCC
-    {
-        void Start();
-    }
-
-    public interface IWcfServerRRRRR
-    {
-        void Start();
+        void Recieve(TContainer container);
     }
 }

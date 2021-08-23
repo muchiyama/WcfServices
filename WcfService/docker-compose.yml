@@ -11,6 +11,8 @@ services:
     networks:
       wcfsamplenetwork:
         ipv4_address: 197.168.10.11
+    volumes:
+      - C:\repos\WcfServices\WcfService\volumes\ccccc:C:\app\bin\logs
     depends_on:
       - wcfserverttttt02
 
@@ -24,6 +26,8 @@ services:
     networks:
       wcfsamplenetwork:
         ipv4_address: 197.168.10.12
+    volumes:
+      - C:\repos\WcfServices\WcfService\volumes\rrrrr:C:\app\bin\logs
     depends_on:
       - wcfserverttttt02
 
@@ -37,6 +41,8 @@ services:
     networks:
       wcfsamplenetwork:
         ipv4_address: 197.168.10.13
+    volumes:
+      - C:\repos\WcfServices\WcfService\volumes\ttttt01:C:\app\bin\logs
 
   wcfserverttttt02:
     image: ${DOCKER_REGISTRY-}wcfserverttttt02
@@ -48,6 +54,8 @@ services:
     networks:
       wcfsamplenetwork:
         ipv4_address: 197.168.10.14
+    volumes:
+      - C:\repos\WcfServices\WcfService\volumes\ttttt02:C:\app\bin\logs
     depends_on:
       - wcfserverttttt01
 
@@ -57,4 +65,6 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 197.168.10.0/24    
+        - subnet: 197.168.10.0/24
+  
+  

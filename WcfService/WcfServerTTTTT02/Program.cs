@@ -15,6 +15,7 @@ namespace WcfServerTTTTT02
     class Program
     {
         static private ILogger m_logger = new WcfConsoleLogger();
+        static private ConfigrationCommon m_config = ConfigrationFactory.GetConfig(HostType.TTTTT02);
         static async Task Main(string[] args)
         {
             await StartUp();
@@ -23,18 +24,17 @@ namespace WcfServerTTTTT02
 
         static async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            if(ConfigrationCommon.Config.BurderingFlag) Burdening.Burden();
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 m_logger.Logging($"server running on {Server.Stauts()} status...");
-                await Task.Delay(ConfigrationCommon.Config.WaitForExecuteAsync);
+                await Task.Delay(m_config.WaitIntervalForTimer);
             }
         }
 
         static async Task StartUp()
         {
-            ((IWcfServerTTTTT02)Server).Start();
+            Server.Start();
 
             Console.WriteLine("IWcfServerTTTTT02 server started");
             Console.WriteLine("wating for IWcfServerTTTTT02 starting service.....");
@@ -46,6 +46,9 @@ namespace WcfServerTTTTT02
                 Server.Dispose();
                 ShutDown();
             };
+
+            if(m_config.BurderingFlag) Burdening.Burden();
+            if (m_config.BurderingEndlessMultiThreading) Burdening.BurdeningWithEndlessMultiThreading();
         }
 
         [STAThread]

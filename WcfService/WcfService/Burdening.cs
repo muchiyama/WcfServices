@@ -21,7 +21,7 @@ namespace WcfService
                             // 2loops
                             await Task.Delay(1000);
                         });
-                        await Task.Delay(ConfigrationCommon.Config.WaitForExecuteAsync);
+                        await Task.Delay(ConfigrationCommon.Config.WaitIntervalForTimer);
                     }  
                 });
         }

@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WcfServerTTTTT02", "WcfServ
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{BAC2F85A-D139-488A-A73D-4B2567DFBF4A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WcfConsoleBase", "WcfConsoleBase\WcfConsoleBase.csproj", "{13059DCB-F997-4E69-B98A-F38273BBEFDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,14 @@ Global
 		{BAC2F85A-D139-488A-A73D-4B2567DFBF4A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BAC2F85A-D139-488A-A73D-4B2567DFBF4A}.Release|x64.ActiveCfg = Release|Any CPU
 		{BAC2F85A-D139-488A-A73D-4B2567DFBF4A}.Release|x64.Build.0 = Release|Any CPU
+		{13059DCB-F997-4E69-B98A-F38273BBEFDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13059DCB-F997-4E69-B98A-F38273BBEFDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13059DCB-F997-4E69-B98A-F38273BBEFDB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{13059DCB-F997-4E69-B98A-F38273BBEFDB}.Debug|x64.Build.0 = Debug|Any CPU
+		{13059DCB-F997-4E69-B98A-F38273BBEFDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13059DCB-F997-4E69-B98A-F38273BBEFDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13059DCB-F997-4E69-B98A-F38273BBEFDB}.Release|x64.ActiveCfg = Release|Any CPU
+		{13059DCB-F997-4E69-B98A-F38273BBEFDB}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
